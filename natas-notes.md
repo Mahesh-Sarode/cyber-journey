@@ -40,3 +40,19 @@ Server executed our injected command instead.
 ## Level 11 — XOR encryption cookie forging
 Used known-plaintext attack to find XOR key (kBSw).
 Forged new cookie with showpassword=yes using Python.
+
+## Level 12 — File Upload Vulnerability
+Server only validated file extension on client side (browser).
+Used Burp Suite to intercept upload request and changed .jpg to .php.
+Uploaded PHP webshell executed system commands on the server.
+
+## Level 13 — Magic Bytes Bypass
+Server used exif_checktype() to verify real image by reading magic bytes.
+JPEG magic bytes are FF D8 FF — added them before PHP code in the file.
+Server accepted file as valid JPEG but executed PHP code inside it.
+
+## Level 14 — SQL Injection Login Bypass
+Login form was vulnerable to SQL injection.
+Payload: ' OR 1=1--
+Quote closed username string, OR 1=1 made condition always true,
+-- commented out password check. Logged in without valid credentials.
