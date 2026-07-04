@@ -10,10 +10,13 @@ Router converts private to public using NAT
 IP = street address, Port = apartment number
 
 ## OSI Model
-7. Application  4. Transport
-6. Presentation 3. Network
-5. Session      2. Data Link
-                1. Physical
+7. Application  
+6. Presentation 
+5. Session 
+4. Transport 
+3. Network 
+2. Data link
+1. Physical 
 
 ## TCP vs UDP
 TCP: reliable, 3-way handshake, ordered
