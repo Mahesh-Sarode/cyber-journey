@@ -56,3 +56,12 @@ Login form was vulnerable to SQL injection.
 Payload: ' OR 1=1--
 Quote closed username string, OR 1=1 made condition always true,
 -- commented out password check. Logged in without valid credentials.
+
+## Level 15 — Blind SQL Injection
+Server only returned yes/no responses. Used SUBSTRING() to extract password character by character manually.
+
+## Level 16 — Blind SQLi Automation
+Wrote Python script with requests library to automate character extraction from password, checking 32 characters × 62 possibilities automatically.
+
+## Level 17 — Time-Based Blind SQLi
+Similar to 15/16 but used sleep(5) function. If response took >5 second
