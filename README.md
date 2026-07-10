@@ -4,7 +4,7 @@ Started: July 2026 | Goal: Cloud DevSecOps Engineer
 
 ## Completed
 - [x] OTW Bandit — all levels
-- [x] OTW Natas — levels 0-11
+- [x] OTW Natas — levels 0-20
 - [x] Networking — IP, subnetting, OSI, TCP/UDP, DNS, ports
 - [x] Web hacking — LFI, cookie manipulation, HTTP headers, robots.txt
 - [x] SQL injection — PortSwigger labs (login bypass, UNION attacks)
@@ -12,7 +12,7 @@ Started: July 2026 | Goal: Cloud DevSecOps Engineer
 - [x] Base64 encoding/decoding
 
 ## In Progress
-- [ ] Natas Level 12+ (file upload)
+- [ ] Natas Level 20+ 
 - [ ] DVWA on Kali VM
 - [ ] TryHackMe Jr Pen Tester path
 - [ ] PortSwigger SQLi (lesson 14/51)
