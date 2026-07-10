@@ -63,5 +63,14 @@ Server only returned yes/no responses. Used SUBSTRING() to extract password char
 ## Level 16 — Blind SQLi Automation
 Wrote Python script with requests library to automate character extraction from password, checking 32 characters × 62 possibilities automatically.
 
-## Level 17 — Time-Based Blind SQLi
-Similar to 15/16 but used sleep(5) function. If response took >5 second
+## Level 17 — Time-Based Blind SQL Injection
+Similar to Level 15/16 but used sleep(5) function instead of yes/no responses.
+If response took >5 seconds, the character was correct. Automated extraction using Python with timing detection.
+
+## Level 18 — Session ID Brute Force
+Username and password don't matter. Brute forced PHPSESSID values (0-640) using Burp Intruder.
+Found correct session ID that logged in as admin and revealed natas19 password.
+
+## Level 19 — Session ID Enumeration
+Similar to 18 but session IDs were encoded. Brute forced encoded session values to find admin access.
+Used Python requests to automate the process and find the correct session.
