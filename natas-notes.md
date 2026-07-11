@@ -74,3 +74,8 @@ Found correct session ID that logged in as admin and revealed natas19 password.
 ## Level 19 — Session ID Enumeration
 Similar to 18 but session IDs were encoded. Brute forced encoded session values to find admin access.
 Used Python requests to automate the process and find the correct session.
+
+## Level 20 — Newline Injection
+Server reads data line-by-line from a file. Injected newline character (%0A) to create a new authenticated line.
+Payload: admin%0Aadmin 1 — bypassed login by injecting "admin" on a new line with admin flag set to 1
+
