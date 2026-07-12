@@ -1,6 +1,6 @@
 # My Cybersecurity Journey
 BCA 2nd Semester | Gangavathi, Karnataka
-Started: July 2026 | Goal: Cloud DevSecOps Engineer
+Started: July 2026 | Goal: Cybersecurity Professional
 
 ## Completed
 - [x] OTW Bandit — all levels
