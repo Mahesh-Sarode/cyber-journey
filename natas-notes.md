@@ -79,3 +79,7 @@ Used Python requests to automate the process and find the correct session.
 Server reads data line-by-line from a file. Injected newline character (%0A) to create a new authenticated line.
 Payload: admin%0Aadmin 1 — bypassed login by injecting "admin" on a new line with admin flag set to 1
 
+## Level 21 — Session Persistence Exploitation
+Experimenter site stored session variables in shared session storage.
+Main site read the same session file. Injected admin=1 into session.
+Exploited insecure shared session storage between two different applications.
