@@ -83,3 +83,17 @@ Payload: admin%0Aadmin 1 — bypassed login by injecting "admin" on a new line w
 Experimenter site stored session variables in shared session storage.
 Main site read the same session file. Injected admin=1 into session.
 Exploited insecure shared session storage between two different applications.
+
+## Level 22 - Execution After Redirect 
+The server issue an HTTP 302 redirect for unauthenticated users but failed to call exit()
+afterward.The PHP script continued executing, leaking the password in the response body. Intercepted the traffic with Burp Suite (or curl) to read the response before the browser followed the redirect.
+
+##Level 23 — PHP Type Juggling
+The application used loose comparison (>) alongside strstr() to validate input. Exploited PHP's weak typing by submitting "11iloveyou", which evaluated to the integer 11 (bypassing the > 10 check) while still containing the required substring.
+
+##Level 24 — strcmp() Array Bypass
+The server used strcmp() to compare the submitted password against the real one. Bypassed the check by passing an array (passwd[]=1) instead of a string in the URL parameters. strcmp() failed to process the array and returned NULL, which loosely evaluated to 0 (a match) in PHP.
+
+##Level 25 — LFI & Log Poisoning
+The server attempted to prevent directory traversal by stripping "../" once, but failed to do it recursively. Bypassed the filter using "....//" which resolved to "../". Poisoned the session log file by injecting a PHP payload via the User-Agent header, then used the LFI vulnerability to include and execute the log file on the server.
+
