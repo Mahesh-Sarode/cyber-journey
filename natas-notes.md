@@ -97,3 +97,8 @@ The server used strcmp() to compare the submitted password against the real one.
 ## Level 25 — LFI & Log Poisoning
 The server attempted to prevent directory traversal by stripping "../" once, but failed to do it recursively. Bypassed the filter using "....//" which resolved to "../". Poisoned the session log file by injecting a PHP payload via the User-Agent header, then used the LFI vulnerability to include and execute the log file on the server.
 
+## Level 26 — Cookie-Based Drawing Manipulation
+Server stored drawing coordinates in cookies (x1, y1, x2, y2).
+Modified cookie values to change drawing coordinates.
+Exploited lack of input validation on cookie-stored drawing parameters.
+
