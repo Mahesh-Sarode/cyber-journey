@@ -102,3 +102,8 @@ Server stored drawing coordinates in cookies (x1, y1, x2, y2).
 Modified cookie values to change drawing coordinates.
 Exploited lack of input validation on cookie-stored drawing parameters.
 
+## Level 27 — ECB Block Cipher Exploitation 
+ECB mode encrypts identical plaintext blocks to identical ciphertext blocks.
+Found block size (16 bytes), then used Python + Burp to brute force password character-by-character.
+Matched encrypted blocks to extract the natas29 password.
+
