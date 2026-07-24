@@ -116,3 +116,8 @@ Matched encrypted blocks to extract the natas29 password.
 Payload input was passed to shell commands without sanitization.
 Used pipe operator (|) to inject additional commands.
 Executed: |cat /etc/*_webpass/*30 to read password file.
+
+## Level 30 — Array Parameter SQL Injection
+Perl's quote() doesn't properly handle array parameters.
+Passed array: ["' or '1'='1"] instead of string to bypass escaping.
+Array injection allowed SQL injection despite quote() protection.
