@@ -102,8 +102,17 @@ Server stored drawing coordinates in cookies (x1, y1, x2, y2).
 Modified cookie values to change drawing coordinates.
 Exploited lack of input validation on cookie-stored drawing parameters.
 
-## Level 27 — ECB Block Cipher Exploitation 
+## Level 27 — Account Truncation in SQL
+Username field was truncated to 64 chars, password wasn't.
+Injected 57 spaces + 'x' in password to bypass registration check.
+Logged in with truncated account to get natas28 password.
+
+## Level 28 — ECB Block Cipher Exploitation 
 ECB mode encrypts identical plaintext blocks to identical ciphertext blocks.
 Found block size (16 bytes), then used Python + Burp to brute force password character-by-character.
 Matched encrypted blocks to extract the natas29 password.
 
+## Level 29 — Command Injection via Pipe Operator
+Payload input was passed to shell commands without sanitization.
+Used pipe operator (|) to inject additional commands.
+Executed: |cat /etc/*_webpass/*30 to read password file.
