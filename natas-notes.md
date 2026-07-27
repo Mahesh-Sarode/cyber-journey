@@ -121,3 +121,8 @@ Executed: |cat /etc/*_webpass/*30 to read password file.
 Perl's quote() doesn't properly handle array parameters.
 Passed array: ["' or '1'='1"] instead of string to bypass escaping.
 Array injection allowed SQL injection despite quote() protection.
+
+## Level 31 — Command Injection via URL Path
+Injected command directly in URL path: cat%20/etc/natas_webpass/natas32%20%7c
+URL encoding: %20=space, %7c=pipe.
+Exploited how the server processes the URL query as part of a shell command.
