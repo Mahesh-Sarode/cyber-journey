@@ -12,7 +12,7 @@ Started: July 2026 | Goal: Cybersecurity Professional
 - [x] Base64 encoding/decoding
 
 ## In Progress
-- [ ] Natas Level 33+ 
+- [ ] Natas Level 33-34 (final stretch!)
 - [ ] DVWA on Kali VM
 - [ ] TryHackMe Jr Pen Tester path
 - [ ] PortSwigger SQLi (lesson 14/51)
