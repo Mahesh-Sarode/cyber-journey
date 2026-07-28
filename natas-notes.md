@@ -126,3 +126,7 @@ Array injection allowed SQL injection despite quote() protection.
 Injected command directly in URL path: cat%20/etc/natas_webpass/natas32%20%7c
 URL encoding: %20=space, %7c=pipe.
 Exploited how the server processes the URL query as part of a shell command.
+
+## Level 32 — Command Injection + Directory Enumeration
+Used ls . | to list directory contents via command injection.
+Found getpassword file, executed it with .getpassword | to reveal natas33 password.
