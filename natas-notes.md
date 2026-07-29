@@ -130,3 +130,10 @@ Exploited how the server processes the URL query as part of a shell command.
 ## Level 32 — Command Injection + Directory Enumeration
 Used ls . | to list directory contents via command injection.
 Found getpassword file, executed it with .getpassword | to reveal natas33 password.
+
+## Level 33 — PHP Phar Deserialization (Object Injection)
+Created malicious Phar file containing serialized PHP object with 
+destructor that executes shell_exec() on a target file.
+When Phar file is loaded/read by server, deserialization triggers 
+the object's __destruct(), running our injected command.
+Advanced technique: PHP Object Injection via Phar metadata.
