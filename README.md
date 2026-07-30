@@ -4,7 +4,7 @@ Started: July 2026 | Goal: Cybersecurity Professional
 
 ## Completed
 - [x] OTW Bandit — all levels
-- [x] OTW Natas — ALL LEVELS COMPLETE (0-33)! 🎉 (Level 34 is unreleased/placeholder)
+- [x] OTW Natas — ALL LEVELS COMPLETE (0-33)!    (Level 34 is unreleased/placeholder)
 - [x] Networking — IP, subnetting, OSI, TCP/UDP, DNS, ports
 - [x] Web hacking — LFI, cookie manipulation, HTTP headers, robots.txt
 - [x] SQL injection — PortSwigger labs (login bypass, UNION attacks)
