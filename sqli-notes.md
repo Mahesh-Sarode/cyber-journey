@@ -12,7 +12,7 @@ Makes condition always true, returns all hidden items.
 Payload: ' OR '1'='1'--
 Bypasses authentication without real password.
 
-## UNION attacks
+# UNION attacks
 Combines results of two SELECT statements.
 Requirements:
 1. Same number of columns
@@ -21,5 +21,11 @@ Requirements:
 Finding columns: ' ORDER BY 1-- then 2-- until error
 Extract data: ' UNION SELECT username,password,NULL FROM users--
 
-## Why -- works
+# Why -- works
 Comments out rest of query after injection point.
+
+## Lab 3 — Finding columns with a useful data type
+Found column count first: ' ORDER BY 1-- through ' ORDER BY 3-- (4 errored, so 3 columns).
+Then tested each column for string compatibility: ' UNION SELECT NULL,'a',NULL--
+Column 2 accepted text without error.
+Used working column to display the lab's random value, confirming injection point for future data extraction.
