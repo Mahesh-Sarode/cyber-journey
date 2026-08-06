@@ -29,3 +29,8 @@ Found column count first: ' ORDER BY 1-- through ' ORDER BY 3-- (4 errored, so 3
 Then tested each column for string compatibility: ' UNION SELECT NULL,'a',NULL--
 Column 2 accepted text without error.
 Used working column to display the lab's random value, confirming injection point for future data extraction.
+
+## Lab 4 — Retrieving data with UNION attack
+Used ' UNION SELECT username, password FROM users-- to dump all user credentials.
+Found administrator's password in the results, logged in as admin.
+Complete UNION SQLi attack chain: injection → data extraction → privilege escalation.
