@@ -1,54 +1,197 @@
 # SQL Injection Notes
 
 ## What is SQLi?
-Single quote ' breaks SQL queries because it is the
-string delimiter. Changes how database interprets the query.
+A single quote `'` breaks out of a SQL query because it is the string
+delimiter. This changes how the database interprets the rest of the
+query, allowing injected logic or additional statements to execute.
 
-## Lab 1 — Hidden data
-Payload: ' OR 1=1--
-Makes condition always true, returns all hidden items.
+---
 
-## Lab 2 — Login bypass
-Payload: ' OR '1'='1'--
-Bypasses authentication without real password.
+## Lab 1: SQL Injection — Bypassing Filters to Access Hidden Data
 
-# UNION attacks
-Combines results of two SELECT statements.
-Requirements:
-1. Same number of columns
-2. Compatible data types
+**Category:** Basic SQL Injection
+**Objective:** Retrieve hidden/unreleased items from the product listing.
 
-Finding columns: ' ORDER BY 1-- then 2-- until error
-Extract data: ' UNION SELECT username,password,NULL FROM users--
+### Payload
+```sql
+' OR 1=1--
+```
 
-# Why -- works
-Comments out rest of query after injection point.
+### Breakdown
+- `OR 1=1` makes the WHERE clause always evaluate true, regardless of the
+  original filter condition.
+- `--` comments out the rest of the original query.
 
-## Lab 3 — Finding columns with a useful data type
-Found column count first: ' ORDER BY 1-- through ' ORDER BY 3-- (4 errored, so 3 columns).
-Then tested each column for string compatibility: ' UNION SELECT NULL,'a',NULL--
-Column 2 accepted text without error.
-Used working column to display the lab's random value, confirming injection point for future data extraction.
+### Result
+Query returned all items, including hidden ones.
 
-## Lab 4 — Retrieving data with UNION attack
-Used ' UNION SELECT username, password FROM users-- to dump all user credentials.
-Found administrator's password in the results, logged in as admin.
-Complete UNION SQLi attack chain: injection → data extraction → privilege escalation.
+### Key Takeaway
+A single always-true condition can bypass filtering logic entirely when
+input isn't sanitized.
 
-## Lab 5 — Retrieving multiple values within a single column
-Used NULL,username||'\~'||password FROM users-- when the query only had
-one usable column for output.
-`||` is Oracle's string concat operator, joins username and password together.
-`~` separator splits the two values apart in the output for easy reading.
-Payload: ' UNION SELECT NULL,username||'~'||password FROM users--
-Leaked output as administrator\~<password>, logged in as admin.
+---
 
-## Lab 6 — Querying the database type and version (MySQL/MSSQL)
-Confirmed 2 text columns first, then pulled version string using @@version.
-`@@version` is a built-in variable on both MySQL and SQL Server, returns
-the DB version directly, no separate lookup table needed.
-Payload: `' UNION SELECT @@version,NULL#`
-Note: typing `#` directly in browser address bar gets stripped as a URL
-fragment before reaching server, breaking the query. Use `%23` instead
-when pasting payloads into the address bar, or use `-- ` comment style.
-Leaked version string, lab solved.
+## Lab 2: SQL Injection — Login Bypass
+
+**Category:** Basic SQL Injection (Authentication Bypass)
+**Objective:** Log in without a valid password.
+
+### Payload
+```sql
+' OR '1'='1'--
+```
+
+### Breakdown
+- `'1'='1'` is always true, same principle as Lab 1 but applied to a login
+  query instead of a filter.
+- `--` comments out the password check that would otherwise follow.
+
+### Result
+Authenticated without knowing the real password.
+
+### Key Takeaway
+Authentication logic built on string-concatenated SQL is trivially
+bypassed with a tautology.
+
+---
+
+## UNION Attacks — Core Concepts
+
+**Purpose:** Combine the results of two SELECT statements into one result
+set, allowing extraction of data from tables the application never
+intended to expose.
+
+**Requirements:**
+1. Both queries must return the same number of columns.
+2. Corresponding columns must have compatible data types.
+
+**Finding column count:**
+```sql
+' ORDER BY 1--
+' ORDER BY 2--
+```
+Increment until the query errors — the last successful number is the
+column count.
+
+**Extracting data:**
+```sql
+' UNION SELECT username,password,NULL FROM users--
+```
+
+**Why `--` works:** it comments out everything after the injection point,
+discarding the remainder of the original query so it doesn't interfere.
+
+---
+
+## Lab 3: SQL Injection — Finding a Column Containing Text
+
+**Category:** UNION-based SQL Injection
+**Objective:** Identify a column that accepts string data, to be used for
+data extraction in later steps.
+
+### Approach
+1. Determined column count by incrementing `ORDER BY` until an error:
+```sql
+   ' ORDER BY 1--
+   ' ORDER BY 2--
+   ' ORDER BY 3--
+   ' ORDER BY 4--   -- errors here, so 3 columns confirmed
+```
+2. Tested each column for string compatibility:
+```sql
+   ' UNION SELECT NULL,'a',NULL--
+```
+   Column 2 accepted the string without error.
+
+### Result
+Confirmed column 2 as string-compatible and displayed the lab's random
+value to verify the injection point.
+
+### Key Takeaway
+Column count and data type must both be confirmed before attempting real
+data extraction — mismatches cause silent failures or errors.
+
+---
+
+## Lab 4: SQL Injection — Retrieving Data with a UNION Attack
+
+**Category:** UNION-based SQL Injection
+**Objective:** Extract user credentials and escalate to admin access.
+
+### Payload
+```sql
+' UNION SELECT username, password FROM users--
+```
+
+### Result
+Dumped all usernames and passwords, including the administrator's
+credentials. Logged in as administrator.
+
+### Key Takeaway
+This is the complete UNION SQLi chain in miniature: confirm injection →
+extract data → escalate privilege using the leaked credentials.
+
+---
+
+## Lab 5: SQL Injection — Retrieving Multiple Values Within a Single Column
+
+**Category:** UNION-based SQL Injection
+**Database:** Oracle
+**Objective:** Extract two values (username, password) when the query only
+exposes one usable output column.
+
+### Payload
+```sql
+' UNION SELECT NULL,username||'~'||password FROM users--
+```
+
+### Breakdown
+- `||` — Oracle's string concatenation operator, joins the two values
+  together.
+- `~` — separator character, allows the combined string to be split back
+  apart visually (e.g. `administrator~s3cure`).
+- `NULL` — placeholder for the first column, which isn't used for output.
+
+### Result
+Output returned as `administrator~<password>`. Logged in as administrator.
+
+### Key Takeaway
+When only one column is usable for output, multiple values can still be
+extracted by concatenating them with a distinct separator. Concatenation
+syntax is database-specific (`||` on Oracle/PostgreSQL, `CONCAT()` on
+MySQL, `+` on SQL Server).
+
+---
+
+## Lab 6: SQL Injection — Querying Database Type and Version (MySQL/MSSQL)
+
+**Category:** UNION-based SQL Injection
+**Database:** MySQL / Microsoft SQL Server
+**Objective:** Retrieve the database version string.
+
+### Approach
+1. Confirmed column count and text compatibility using a probe payload:
+```sql
+   ' UNION SELECT 'abc','def'#
+```
+2. Replaced the probe values with `@@version`, a built-in system variable
+   available on both MySQL and SQL Server, to extract the version string
+   directly.
+
+### Payload
+```sql
+' UNION SELECT @@version,NULL#
+```
+
+### Result
+Database returned: `8.0.42-0ubuntu0.20.04.1`
+
+### Notes / Gotchas
+- Typing `#` directly into a browser address bar gets interpreted as a URL
+  fragment and is stripped before the request is sent, breaking the query.
+- Fix: URL-encode as `%23`, or use the `-- ` (double-dash + space) comment
+  style, which browsers don't touch.
+
+### Key Takeaway
+`@@version` works cross-database (MySQL + MSSQL), making it a fast way to
+fingerprint the backend without needing separate payloads per DB type.
