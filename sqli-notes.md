@@ -273,3 +273,30 @@ Extracted password: `l1mw6ekepq9ay1g0idf4`. Logged in as `administrator` → lab
 When manually reading results off a Burp Intruder grid, ambiguous characters (`0` vs `o`, `1` vs `l`, `5` vs `S`) will silently break your login attempt and look like a failed exploit even though the extraction was correct. Copy/export the payload values directly rather than eyeballing them off the table.
 
 ---
+
+## Lab 9: Visible error-based SQL injection
+
+**Category:** SQL Injection — Error-Based
+**Database:** Likely PostgreSQL (based on `invalid input syntax for type integer` error)
+**Objective:** Leak the `administrator` user's password via verbose SQL error messages returned by the app, then log in as them.
+
+### Payload
+
+TrackingId=' AND 1=CAST((SELECT username FROM users LIMIT 1) AS int)--
+TrackingId=' AND 1=CAST((SELECT password FROM users LIMIT 1) AS int)--
+
+
+### Approach
+- Injected into the `TrackingId` cookie value via Burp Repeater
+- Confirmed injection with a single `'` → verbose error disclosed the full query, showing the input lands inside a quoted string
+- Commented out the trailing query fragment with `--` to get back to a valid query
+- Forced a type-mismatch error by wrapping a subquery in `CAST(... AS int)` — since usernames/passwords aren't integers, the DB throws an error that **includes the actual value** in the message
+- Hit a character limit once the subquery got long, so dropped the original cookie value to free up space
+- Added `LIMIT 1` after getting a "more than one row returned" error, since `CAST` only accepts a single scalar
+- Error message leaked `administrator` as the username, then reused the same trick on the `password` column
+
+### Result
+Extracted the administrator's password directly from the database's own error output, logged in, lab solved.
+
+### Key Takeaway
+When an app suppresses query results but doesn't handle DB errors gracefully, you can turn the **error message itself into an oracle** — `CAST()` is a reliable way to force a type-conversion error that echoes back arbitrary data, one row at a time.
