@@ -9,7 +9,7 @@ practiced only in legal labs (CTF platforms and my own VMs).
 
 | Area | Platform / Tool | Notes |
 |------|-----------------|-------|
-| Linux basics | OverTheWire Bandit | [add link or status] |
+| Linux basics | OverTheWire Bandit | All labs completed|
 | Web security | OverTheWire Natas | [natas-notes.md](natas-notes.md) |
 | SQL injection | PortSwigger Web Security Academy | [sqli-notes.md](sqli-notes.md) (up to Lab 11, Blind SQLi OOB) |
 | Networking | Networking fundamentals | [networking-notes.md](networking-notes.md) |
