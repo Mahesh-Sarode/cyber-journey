@@ -30,3 +30,37 @@ Plain HTTP is readable by anyone on the network, and the User-Agent is
 client-controlled so it can be spoofed (`curl -A`). Servers that leak
 version info (e.g. `Server: Apache/2.4.68`) help attackers fingerprint
 targets; Cloudflare hides it.
+
+  ---
+
+## Lab: HTTP Header Spoofing with curl + Wireshark
+
+**Category:** Networking / Packet Analysis
+**Environment:** Kali Linux VM, Wireshark on eth0
+**Objective:** Change the headers curl sends and prove it in a packet capture
+
+### Payload
+```bash
+curl http://example.com
+curl -A "Mozilla/5.0(Windows NT 10.0; Win64; x64)" http://example.com
+curl -H "X-TEST: hello-TEST" http://example.com
+```
+
+### Breakdown
+- `-A` sets the User-Agent header
+- `-H` adds any custom header (name and value)
+- Wireshark filters used: `http.request`, `http contains "hello-TEST"`
+- `contains` is case-sensitive
+- TCP payload grew from 75 to 104 bytes with the fake User-Agent (+29)
+- The custom header added exactly 20 bytes (149 to 169 byte frames)
+
+### Result
+- Plain request showed `User-Agent: curl/8.22.0`
+- Spoofed request showed a fake Windows browser string
+- Custom header `X-TEST: hello-TEST` appeared in the packet
+- Capture saved as `useragent-spoof.pcapng`
+
+### Key Takeaway
+Every HTTP header is client-controlled text. Servers can't verify the
+User-Agent, so blocking tools like curl or sqlmap by User-Agent is weak
+security. Never trust client headers for access decisions.  
